@@ -5,17 +5,22 @@
 //
 // For the license information refer to format.h.
 
-#ifndef FMT_CORE_H_
-#define FMT_CORE_H_
+#ifndef HUFFMAN_CORE_H_
+#define HUFFMAN_CORE_H_
 
 #include <cstdio>  // std::FILE
 #include <cstring>
 #include <iterator>
 #include <string>
 #include <type_traits>
+#include <iostream>
 
 // The fmt library version in the form major * 10000 + minor * 100 + patch.
-#define FMT_VERSION 00001
+#define HUFFMAN_VERSION 00001
+
+namespace huffman {
+    void foo();
+}
 
 // #ifdef __clang__
 // #  define FMT_CLANG_VERSION (__clang_major__ * 100 + __clang_minor__)
@@ -1921,4 +1926,4 @@
 // (not recommended).
 // #ifdef FMT_DYNAMIC_ARGS
 // #  include "args.h"
-#endif
+// #endif
