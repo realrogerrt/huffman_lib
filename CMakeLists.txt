@@ -183,13 +183,8 @@ function(add_headers VAR)
 endfunction()
 
 # Define the huffman library, its includes and the needed defines.
-add_headers(HUFFMAN_HEADERS chrono.h color.h compile.h core.h format.h format-inl.h
-                        locale.h os.h ostream.h posix.h printf.h ranges.h)
-if (HUFFMAN_OS)
-  set(HUFFMAN_SOURCES src/format.cc src/os.cc)
-else()
-  set(HUFFMAN_SOURCES src/format.cc)
-endif ()
+add_headers(HUFFMAN_HEADERS core.h os.h)
+set(HUFFMAN_SOURCES src/core.cc)
 
 add_library(huffman ${HUFFMAN_SOURCES} ${HUFFMAN_HEADERS} README.rst ChangeLog.rst)
 add_library(huffman::huffman ALIAS huffman)
