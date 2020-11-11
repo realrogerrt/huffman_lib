@@ -5,7 +5,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
   cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-# Determine if fmt is built as a subproject (using add_subdirectory)
+# Determine if huffman is built as a subproject (using add_subdirectory)
 # or if it is the master project.
 set(MASTER_PROJECT OFF)
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -50,36 +50,36 @@ if (MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
               "CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 endif ()
 
-project(FMT CXX)
+project(HUFFMAN CXX)
 include(GNUInstallDirs)
-set_verbose(FMT_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE STRING
+set_verbose(HUFFMAN_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE STRING
             "Installation directory for include files, a relative path that "
             "will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute path.")
 
-option(FMT_PEDANTIC "Enable extra warnings and expensive tests." OFF)
-option(FMT_WERROR "Halt the compilation with an error on compiler warnings."
+option(HUFFMAN_PEDANTIC "Enable extra warnings and expensive tests." OFF)
+option(HUFFMAN_WERROR "Halt the compilation with an error on compiler warnings."
        OFF)
 
 # Options that control generation of various targets.
-option(FMT_DOC "Generate the doc target." ${MASTER_PROJECT})
-option(FMT_INSTALL "Generate the install target." ${MASTER_PROJECT})
-option(FMT_TEST "Generate the test target." ${MASTER_PROJECT})
-option(FMT_FUZZ "Generate the fuzz target." OFF)
-option(FMT_CUDA_TEST "Generate the cuda-test target." OFF)
-option(FMT_OS "Include core requiring OS (Windows/Posix) " ON)
+option(HUFFMAN_DOC "Generate the doc target." ${MASTER_PROJECT})
+option(HUFFMAN_INSTALL "Generate the install target." ${MASTER_PROJECT})
+option(HUFFMAN_TEST "Generate the test target." ${MASTER_PROJECT})
+option(HUFFMAN_FUZZ "Generate the fuzz target." OFF)
+option(HUFFMAN_CUDA_TEST "Generate the cuda-test target." OFF)
+option(HUFFMAN_OS "Include core requiring OS (Windows/Posix) " ON)
 
 # Get version from core.h
-file(READ include/fmt/core.h core_h)
-if (NOT core_h MATCHES "FMT_VERSION ([0-9]+)([0-9][0-9])([0-9][0-9])")
-  message(FATAL_ERROR "Cannot get FMT_VERSION from core.h.")
+file(READ include/huffman/core.h core_h)
+if (NOT core_h MATCHES "HUFFMAN_VERSION ([0-9]+)([0-9][0-9])([0-9][0-9])")
+  message(FATAL_ERROR "Cannot get HUFFMAN_VERSION from core.h.")
 endif ()
 # Use math to skip leading zeros if any.
 math(EXPR CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_MATCH_1})
 math(EXPR CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
 math(EXPR CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
-join(FMT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.
+join(HUFFMAN_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.
                  ${CPACK_PACKAGE_VERSION_PATCH})
-message(STATUS "Version: ${FMT_VERSION}")
+message(STATUS "Version: ${HUFFMAN_VERSION}")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
@@ -98,9 +98,9 @@ list(FIND CMAKE_CXX_COMPILE_FEATURES "cxx_variadic_templates" index)
 if (${index} GREATER -1)
   # Use cxx_variadic_templates instead of more appropriate cxx_std_11 for
   # compatibility with older CMake versions.
-  set(FMT_REQUIRED_FEATURES cxx_variadic_templates)
+  set(HUFFMAN_REQUIRED_FEATURES cxx_variadic_templates)
 endif ()
-message(STATUS "Required features: ${FMT_REQUIRED_FEATURES}")
+message(STATUS "Required features: ${HUFFMAN_REQUIRED_FEATURES}")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(PEDANTIC_COMPILE_FLAGS -pedantic-errors -Wall -Wextra -pedantic
@@ -177,58 +177,58 @@ endif ()
 function(add_headers VAR)
   set(headers ${${VAR}})
   foreach (header ${ARGN})
-    set(headers ${headers} include/fmt/${header})
+    set(headers ${headers} include/huffman/${header})
   endforeach()
   set(${VAR} ${headers} PARENT_SCOPE)
 endfunction()
 
-# Define the fmt library, its includes and the needed defines.
-add_headers(FMT_HEADERS chrono.h color.h compile.h core.h format.h format-inl.h
+# Define the huffman library, its includes and the needed defines.
+add_headers(HUFFMAN_HEADERS chrono.h color.h compile.h core.h format.h format-inl.h
                         locale.h os.h ostream.h posix.h printf.h ranges.h)
-if (FMT_OS)
-  set(FMT_SOURCES src/format.cc src/os.cc)
+if (HUFFMAN_OS)
+  set(HUFFMAN_SOURCES src/format.cc src/os.cc)
 else()
-  set(FMT_SOURCES src/format.cc)
+  set(HUFFMAN_SOURCES src/format.cc)
 endif ()
 
-add_library(fmt ${FMT_SOURCES} ${FMT_HEADERS} README.rst ChangeLog.rst)
-add_library(fmt::fmt ALIAS fmt)
+add_library(huffman ${HUFFMAN_SOURCES} ${HUFFMAN_HEADERS} README.rst ChangeLog.rst)
+add_library(huffman::huffman ALIAS huffman)
 
 if (HAVE_STRTOD_L)
-  target_compile_definitions(fmt PUBLIC FMT_LOCALE)
+  target_compile_definitions(huffman PUBLIC HUFFMAN_LOCALE)
 endif ()
 
 if (MINGW)
-  check_cxx_compiler_flag("Wa,-mbig-obj" FMT_HAS_MBIG_OBJ)
-  if (${FMT_HAS_MBIG_OBJ})
-    target_compile_options(fmt PUBLIC "-Wa,-mbig-obj")
+  check_cxx_compiler_flag("Wa,-mbig-obj" HUFFMAN_HAS_MBIG_OBJ)
+  if (${HUFFMAN_HAS_MBIG_OBJ})
+    target_compile_options(huffman PUBLIC "-Wa,-mbig-obj")
   endif()
 endif ()
 
-if (FMT_WERROR)
-  target_compile_options(fmt PRIVATE ${WERROR_FLAG})
+if (HUFFMAN_WERROR)
+  target_compile_options(huffman PRIVATE ${WERROR_FLAG})
 endif ()
-if (FMT_PEDANTIC)
-  target_compile_options(fmt PRIVATE ${PEDANTIC_COMPILE_FLAGS})
+if (HUFFMAN_PEDANTIC)
+  target_compile_options(huffman PRIVATE ${PEDANTIC_COMPILE_FLAGS})
 endif ()
 
-target_compile_features(fmt INTERFACE ${FMT_REQUIRED_FEATURES})
+target_compile_features(huffman INTERFACE ${HUFFMAN_REQUIRED_FEATURES})
 
-target_include_directories(fmt PUBLIC
+target_include_directories(huffman PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:${FMT_INC_DIR}>)
+  $<INSTALL_INTERFACE:${HUFFMAN_INC_DIR}>)
 
-set(FMT_DEBUG_POSTFIX d CACHE STRING "Debug library postfix.")
+set(HUFFMAN_DEBUG_POSTFIX d CACHE STRING "Debug library postfix.")
 
-set_target_properties(fmt PROPERTIES
-  VERSION ${FMT_VERSION} SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}
-  DEBUG_POSTFIX "${FMT_DEBUG_POSTFIX}")
+set_target_properties(huffman PROPERTIES
+  VERSION ${HUFFMAN_VERSION} SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}
+  DEBUG_POSTFIX "${HUFFMAN_DEBUG_POSTFIX}")
 
-# Set FMT_LIB_NAME for pkg-config fmt.pc. We cannot use the OUTPUT_NAME target
+# Set HUFFMAN_LIB_NAME for pkg-config huffman.pc. We cannot use the OUTPUT_NAME target
 # property because it's not set by default.
-set(FMT_LIB_NAME fmt)
+set(HUFFMAN_LIB_NAME huffman)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(FMT_LIB_NAME ${FMT_LIB_NAME}${FMT_DEBUG_POSTFIX})
+  set(HUFFMAN_LIB_NAME ${HUFFMAN_LIB_NAME}${HUFFMAN_DEBUG_POSTFIX})
 endif ()
 
 if (BUILD_SHARED_LIBS)
@@ -236,41 +236,41 @@ if (BUILD_SHARED_LIBS)
       NOT EMSCRIPTEN)
     # Fix rpmlint warning:
     # unused-direct-shlib-dependency /usr/lib/libformat.so.1.1.0 /lib/libm.so.6.
-    target_link_libraries(fmt -Wl,--as-needed)
+    target_link_libraries(huffman -Wl,--as-needed)
   endif ()
-  target_compile_definitions(fmt PRIVATE FMT_EXPORT INTERFACE FMT_SHARED)
+  target_compile_definitions(huffman PRIVATE HUFFMAN_EXPORT INTERFACE HUFFMAN_SHARED)
 endif ()
-if (FMT_SAFE_DURATION_CAST)
-  target_compile_definitions(fmt PUBLIC FMT_SAFE_DURATION_CAST)
+if (HUFFMAN_SAFE_DURATION_CAST)
+  target_compile_definitions(huffman PUBLIC HUFFMAN_SAFE_DURATION_CAST)
 endif()
 
-add_library(fmt-header-only INTERFACE)
-add_library(fmt::fmt-header-only ALIAS fmt-header-only)
+add_library(huffman-header-only INTERFACE)
+add_library(huffman::huffman-header-only ALIAS huffman-header-only)
 
-target_compile_definitions(fmt-header-only INTERFACE FMT_HEADER_ONLY=1)
-target_compile_features(fmt-header-only INTERFACE ${FMT_REQUIRED_FEATURES})
+target_compile_definitions(huffman-header-only INTERFACE HUFFMAN_HEADER_ONLY=1)
+target_compile_features(huffman-header-only INTERFACE ${HUFFMAN_REQUIRED_FEATURES})
 
-target_include_directories(fmt-header-only INTERFACE
+target_include_directories(huffman-header-only INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:${FMT_INC_DIR}>)
+  $<INSTALL_INTERFACE:${HUFFMAN_INC_DIR}>)
 
 # Install targets.
-if (FMT_INSTALL)
+if (HUFFMAN_INSTALL)
   include(CMakePackageConfigHelpers)
-  set_verbose(FMT_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/fmt CACHE STRING
+  set_verbose(HUFFMAN_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/huffman CACHE STRING
               "Installation directory for cmake files, a relative path that "
               "will be joined with ${CMAKE_INSTALL_PREFIX} or an absolute "
               "path.")
-  set(version_config ${PROJECT_BINARY_DIR}/fmt-config-version.cmake)
-  set(project_config ${PROJECT_BINARY_DIR}/fmt-config.cmake)
-  set(pkgconfig ${PROJECT_BINARY_DIR}/fmt.pc)
-  set(targets_export_name fmt-targets)
+  set(version_config ${PROJECT_BINARY_DIR}/huffman-config-version.cmake)
+  set(project_config ${PROJECT_BINARY_DIR}/huffman-config.cmake)
+  set(pkgconfig ${PROJECT_BINARY_DIR}/huffman.pc)
+  set(targets_export_name huffman-targets)
 
-  set_verbose(FMT_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE STRING
+  set_verbose(HUFFMAN_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE STRING
               "Installation directory for libraries, a relative path that "
               "will be joined to ${CMAKE_INSTALL_PREFIX} or an absolute path.")
 
-  set_verbose(FMT_PKGCONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/pkgconfig CACHE PATH
+  set_verbose(HUFFMAN_PKGCONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/pkgconfig CACHE PATH
               "Installation directory for pkgconfig (.pc) files, a relative "
               "path that will be joined with ${CMAKE_INSTALL_PREFIX} or an "
               "absolute path.")
@@ -278,65 +278,65 @@ if (FMT_INSTALL)
   # Generate the version, config and target files into the build directory.
   write_basic_package_version_file(
     ${version_config}
-    VERSION ${FMT_VERSION}
+    VERSION ${HUFFMAN_VERSION}
     COMPATIBILITY AnyNewerVersion)
 
-  join_paths(libdir_for_pc_file "\${exec_prefix}" "${FMT_LIB_DIR}")
-  join_paths(includedir_for_pc_file "\${prefix}" "${FMT_INC_DIR}")
+  join_paths(libdir_for_pc_file "\${exec_prefix}" "${HUFFMAN_LIB_DIR}")
+  join_paths(includedir_for_pc_file "\${prefix}" "${HUFFMAN_INC_DIR}")
 
   configure_file(
-    "${PROJECT_SOURCE_DIR}/support/cmake/fmt.pc.in"
+    "${PROJECT_SOURCE_DIR}/support/cmake/huffman.pc.in"
     "${pkgconfig}"
     @ONLY)
   configure_package_config_file(
-    ${PROJECT_SOURCE_DIR}/support/cmake/fmt-config.cmake.in
+    ${PROJECT_SOURCE_DIR}/support/cmake/huffman-config.cmake.in
     ${project_config}
-    INSTALL_DESTINATION ${FMT_CMAKE_DIR})
+    INSTALL_DESTINATION ${HUFFMAN_CMAKE_DIR})
 
-  set(INSTALL_TARGETS fmt fmt-header-only)
+  set(INSTALL_TARGETS huffman huffman-header-only)
   # Use a namespace because CMake provides better diagnostics for namespaced
   # imported targets.
-  export(TARGETS ${INSTALL_TARGETS} NAMESPACE fmt::
+  export(TARGETS ${INSTALL_TARGETS} NAMESPACE huffman::
          FILE ${PROJECT_BINARY_DIR}/${targets_export_name}.cmake)
 
   # Install version, config and target files.
   install(
     FILES ${project_config} ${version_config}
-    DESTINATION ${FMT_CMAKE_DIR})
-  install(EXPORT ${targets_export_name} DESTINATION ${FMT_CMAKE_DIR}
-          NAMESPACE fmt::)
+    DESTINATION ${HUFFMAN_CMAKE_DIR})
+  install(EXPORT ${targets_export_name} DESTINATION ${HUFFMAN_CMAKE_DIR}
+          NAMESPACE huffman::)
 
   # Install the library and headers.
   install(TARGETS ${INSTALL_TARGETS} EXPORT ${targets_export_name}
-          LIBRARY DESTINATION ${FMT_LIB_DIR}
-          ARCHIVE DESTINATION ${FMT_LIB_DIR}
+          LIBRARY DESTINATION ${HUFFMAN_LIB_DIR}
+          ARCHIVE DESTINATION ${HUFFMAN_LIB_DIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
   install(FILES $<TARGET_PDB_FILE:${INSTALL_TARGETS}>
-          DESTINATION ${FMT_LIB_DIR} OPTIONAL)
-  install(FILES ${FMT_HEADERS} DESTINATION "${FMT_INC_DIR}/fmt")
-  install(FILES "${pkgconfig}" DESTINATION "${FMT_PKGCONFIG_DIR}")
+          DESTINATION ${HUFFMAN_LIB_DIR} OPTIONAL)
+  install(FILES ${HUFFMAN_HEADERS} DESTINATION "${HUFFMAN_INC_DIR}/huffman")
+  install(FILES "${pkgconfig}" DESTINATION "${HUFFMAN_PKGCONFIG_DIR}")
 endif ()
 
-if (FMT_DOC)
+if (HUFFMAN_DOC)
   add_subdirectory(doc)
 endif ()
 
-if (FMT_TEST)
+if (HUFFMAN_TEST)
   enable_testing()
   add_subdirectory(test)
 endif ()
 
 # Control fuzzing independent of the unit tests.
-if (FMT_FUZZ)
+if (HUFFMAN_FUZZ)
   add_subdirectory(test/fuzzing)
 
-  # The FMT_FUZZ macro is used to prevent resource exhaustion in fuzzing
+  # The HUFFMAN_FUZZ macro is used to prevent resource exhaustion in fuzzing
   # mode and make fuzzing practically possible. It is similar to
   # FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION but uses a different name to
-  # avoid interfering with fuzzing of projects that use {fmt}.
+  # avoid interfering with fuzzing of projects that use {huffman}.
   # See also https://llvm.org/docs/LibFuzzer.html#fuzzer-friendly-build-mode.
-  target_compile_definitions(fmt PUBLIC FMT_FUZZ)
+  target_compile_definitions(huffman PUBLIC HUFFMAN_FUZZ)
 endif ()
 
 set(gitignore ${PROJECT_SOURCE_DIR}/.gitignore)
@@ -354,8 +354,8 @@ if (MASTER_PROJECT AND EXISTS ${gitignore})
 
   set(CPACK_SOURCE_GENERATOR ZIP)
   set(CPACK_SOURCE_IGNORE_FILES ${ignored_files})
-  set(CPACK_SOURCE_PACKAGE_FILE_NAME fmt-${FMT_VERSION})
-  set(CPACK_PACKAGE_NAME fmt)
+  set(CPACK_SOURCE_PACKAGE_FILE_NAME huffman-${HUFFMAN_VERSION})
+  set(CPACK_PACKAGE_NAME huffman)
   set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.rst)
   include(CPack)
 endif ()
