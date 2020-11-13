@@ -32,6 +32,7 @@ struct __frequency_node {
 };
 typedef shared_ptr<__frequency_node> node_ptr;
 typedef __frequency_node* __node_ptr;
+typedef unordered_map<uint8_t, __frequency_node> symbol_map;
 
 bool operator<(const __frequency_node&, const __frequency_node&);
 
@@ -39,13 +40,27 @@ std::ostream& operator<<(std::ostream&, const __frequency_node&);
 
 std::ifstream& operator>>(std::ifstream&, __frequency_node&);
 
+class key_map {
+  private:
+    __node_ptr root;
+    symbol_map symbols;
+
+  public:
+    void feed_node(const __frequency_node&);
+    __node_ptr build_tree();
+
+};
+
 class compressor {
 
   private:
   string file_name;
+  key_map key_map_ref;
 
   public:
   compressor(const string&);
+
+  void __build_key_tree_old();
   void __build_key_tree();
 
 
