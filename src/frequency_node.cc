@@ -11,10 +11,15 @@ node_ptr frequency_node::__merge(node_ptr other) {
   node_ptr n = new frequency_node;
   n->__frequency = this->__frequency + other->__frequency;
 
+  // cout << "setting left on " << n << " to "  << this << endl;
   n->__left = this;
   n->__right = other;
+  // cout << "setting right on " << n << " to "  << other << endl;
+  n->__parent = nullptr;
 
+  // cout << "setting parent on " << other << " " << other->__value << " to "  << n << endl;
   other->__parent = n;
+  // cout << "setting parent on " << this << " " << this->__value << " to "  << n << endl;
   this->__parent = n;
 
   return n;

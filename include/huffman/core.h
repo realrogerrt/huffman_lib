@@ -18,6 +18,8 @@ namespace huffman {
 
 using namespace std;
 
+void print_binary(uint64_t);
+
 struct frequency_node {
   frequency_node* __parent;
   frequency_node* __left;
@@ -30,6 +32,8 @@ struct frequency_node {
   frequency_type __frequency;
 
   frequency_node* __merge(frequency_node*);
+
+  bool leaf() { return !__left && !__right; }
 };
 typedef frequency_node* node_ptr;
 typedef unordered_map<frequency_node::symbol_type, frequency_node> symbol_map;
@@ -37,9 +41,7 @@ typedef unordered_map<frequency_node::symbol_type, frequency_node> symbol_map;
 bool operator>(const frequency_node&, const frequency_node&);
 
 template <class _Pt> struct greater_ptr : binary_function<_Pt, _Pt, bool> {
-  bool operator()(const _Pt& __x, const _Pt& __y) const {
-    return *__x > *__y;
-  }
+  bool operator()(const _Pt& __x, const _Pt& __y) const { return *__x > *__y; }
 };
 
 std::ostream& operator<<(std::ostream&, const frequency_node&);
@@ -60,7 +62,8 @@ class key_map {
   node_ptr __build_tree();
   void __write_head(ostream&);
   void __reset();
-  translation_pair translate(frequency_node::symbol_type symbol);
+  translation_pair encode(frequency_node::symbol_type);
+  node_ptr decode(uint64_t&, node_ptr, size_t&);
 };
 
 class compressor {
