@@ -2,6 +2,13 @@
 
 namespace huffman {
 
+void key_map::reset() {
+  this->symbols.clear();
+  if (this->root) {
+    delete this->root;
+  }
+}
+
 void key_map::feed_node(const __frequency_node& np) {
   if (this->symbols.count(np.__value) == 0) {
     this->symbols[np.__value].__value = np.__value;
@@ -17,7 +24,7 @@ __node_ptr key_map::build_tree() {
     cout << it->second << endl;
     q.push(&it->second);
   }
-  
+
   __node_ptr a = nullptr;
   __node_ptr b = nullptr;
   __node_ptr merged = nullptr;
@@ -39,14 +46,8 @@ __node_ptr key_map::build_tree() {
   __node_ptr root = q.top();
   q.pop();
   this->root = root;
-  
+
   return root;
-
 }
-
-
-
-
-
 
 }  // namespace huffman

@@ -48,6 +48,8 @@ class key_map {
   public:
     void feed_node(const __frequency_node&);
     __node_ptr build_tree();
+    void reset();
+
 
 };
 
@@ -62,7 +64,6 @@ class compressor {
 
   void __build_key_tree_old();
   void __build_key_tree();
-
 
 };
 
