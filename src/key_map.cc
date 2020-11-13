@@ -42,20 +42,10 @@ key_map::translation_pair key_map::encode(frequency_node::symbol_type symbol) {
   stack<int> s;
 
   while (ptr != __root) {
-    // chunk <<= 1;
     if (ptr->__parent->__left == ptr) {
-      // chunk += 0;
       s.push(0);
     } else if (ptr->__parent->__right == ptr) {
-      // chunk += 1;
       s.push(1);
-      // single_one = 1 << node_depth;
-      // debug(node_depth)
-      // debug(single_one)
-      // debug(chunk)
-      // print_binary(single_one);
-      // print_binary(chunk);
-      // chunk = chunk | single_one;
     } else {
       throw invalid_argument("conceptual error");
     }
@@ -63,15 +53,12 @@ key_map::translation_pair key_map::encode(frequency_node::symbol_type symbol) {
     ptr = ptr->__parent;
   }
 
-  while (!s.empty())
-  {
+  while (!s.empty()) {
      key_map::chunk_type curr = s.top();
      single_one = curr << (node_depth - s.size());
      chunk = chunk | single_one;
      s.pop();
   }
-
-
   cout << symbol << " becomes " << chunk << " with " << node_depth << endl;
 
   return make_pair(chunk, node_depth);

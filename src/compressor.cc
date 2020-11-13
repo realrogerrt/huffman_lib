@@ -60,9 +60,10 @@ void compressor::expand() {
   while (is.read(reinterpret_cast<char*>(&partial_path),
                  min(sizeof(partial_path), total_size - (size_t)is.tellg()))) {
     // debug(is.tellg());
-    print_binary(partial_path);
-    // debug(bits_remaining_in_path)
+    cout << "NEW PATH" << endl;
     while (bits_remaining_in_path > 0 && total_chars > 0) {
+      debug(bits_remaining_in_path)
+      print_binary(partial_path);
       // debug((int) partial_path)
       node = __key_map_ref.decode(partial_path, node, bits_remaining_in_path);
       // debug((int) partial_path)
@@ -71,11 +72,12 @@ void compressor::expand() {
         // debug((int)node->__value);
         os.write((char*)&node->__value, sizeof(node->__value));
         total_chars--;
-        debug((char) node->__value)
-        debug(total_chars)
+        // debug((char) node->__value)
+        // debug(total_chars)
       }
     }
 
+    debug(bits_remaining_in_path)
     bits_remaining_in_path = full_size;
     // debug(is.tellg());
     if (is.tellg() == total_size) {
@@ -121,6 +123,7 @@ void compressor::compress() {
     size_t bits_for_next_chunk = max(overflow_bits, 0);
     // extended_chunk <<= (remaining_bits - symbol_bits + bits_for_next_chunk);
     extended_chunk <<= (chunk_bits - remaining_bits);
+    cout << "=================" << endl;
     huffman::print_binary(chunk_to_write);
     huffman::print_binary(extended_chunk);
     chunk_to_write = chunk_to_write | extended_chunk;
@@ -134,13 +137,27 @@ void compressor::compress() {
 
     // TODO: All these 8's and 64's must come from generic info
     if (bits_for_next_chunk > 0) {
+      debug(bits_for_next_chunk)
       symbol_chunk = p.first;
-      symbol_chunk >>= (symbol_bits - bits_for_next_chunk);
+      // symbol_chunk = 4;
+      cout << "prefilled chunk" << endl;
+      print_binary(symbol_chunk);
+      debug((symbol_bits - bits_for_next_chunk))
+      // symbol_chunk >>= (symbol_bits - bits_for_next_chunk);
+      symbol_chunk >>= (p.second - bits_for_next_chunk);
+      print_binary(symbol_chunk);
       extended_chunk = static_cast<uint64_t>(symbol_chunk);
       // extended_chunk <<= (chunk_bits - symbol_bits);
 
       chunk_to_write = extended_chunk;
+      debug(symbol)
+      debug(symbol_chunk)
+      debug(p.second)
+      print_binary(symbol_chunk);
+      print_binary(chunk_to_write);
+
       remaining_bits -= bits_for_next_chunk;
+      debug(remaining_bits)
     }
   }
   delete[] bin;
