@@ -5,6 +5,10 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <unordered_map>
+#include <queue>
+#include <iterator>
+#include <vector>
 
 
 // major * 10000 + minor * 100 + patch.
@@ -13,6 +17,7 @@
 namespace huffman {
 
 using namespace std;
+
 struct __frequency_node {
 
   __frequency_node* __parent;
@@ -26,6 +31,7 @@ struct __frequency_node {
 
 };
 typedef shared_ptr<__frequency_node> node_ptr;
+typedef __frequency_node* __node_ptr;
 
 bool operator<(const __frequency_node&, const __frequency_node&);
 
@@ -33,14 +39,14 @@ std::ostream& operator<<(std::ostream&, const __frequency_node&);
 
 std::ifstream& operator>>(std::ifstream&, __frequency_node&);
 
-class __compressor {
+class compressor {
 
   private:
   string file_name;
 
   public:
-  __compressor(const string&);
-  void __run(string);
+  compressor(const string&);
+  void __build_key_tree();
 
 
 };
