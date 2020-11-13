@@ -28,11 +28,11 @@ void compressor::expand() {
   frequency_node n;
 
   while (len > 0) {
-    // debug(is.tellg());
+    debug(is.tellg());
     is >> n;
-    // debug((int)n.__value);
-    // debug((char)n.__value);
-    // debug((int)n.__frequency);
+    debug((int)n.__value);
+    debug((char)n.__value);
+    debug((int)n.__frequency);
     total_chars += n.__frequency;
     // cout << "====" << endl;
     __key_map_ref.__feed_node(n);
@@ -71,6 +71,8 @@ void compressor::expand() {
         // debug((int)node->__value);
         os.write((char*)&node->__value, sizeof(node->__value));
         total_chars--;
+        debug((char) node->__value)
+        debug(total_chars)
       }
     }
 
@@ -158,7 +160,7 @@ void compressor::__write_and_reset(ofstream& os, uint64_t& chunk,
   size_t bytes_used = ceil((chunk_bits - remaining) / 8.0f);
 
   print_binary(chunk);
-  // debug(bytes_used);
+  debug(bytes_used);
   // debug(remaining);
 
   os.write(data_ptr, bytes_used);

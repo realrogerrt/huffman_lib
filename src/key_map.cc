@@ -39,25 +39,40 @@ key_map::translation_pair key_map::encode(frequency_node::symbol_type symbol) {
   key_map::chunk_type chunk = 0;
   key_map::chunk_type single_one = 0;
   key_map::count_type node_depth = 0;
+  stack<int> s;
 
   while (ptr != __root) {
     // chunk <<= 1;
     if (ptr->__parent->__left == ptr) {
       // chunk += 0;
+      s.push(0);
     } else if (ptr->__parent->__right == ptr) {
       // chunk += 1;
-      single_one = 1 << node_depth;
-      chunk = chunk | single_one;
+      s.push(1);
+      // single_one = 1 << node_depth;
+      // debug(node_depth)
+      // debug(single_one)
+      // debug(chunk)
+      // print_binary(single_one);
+      // print_binary(chunk);
+      // chunk = chunk | single_one;
     } else {
       throw invalid_argument("conceptual error");
     }
     node_depth++;
     ptr = ptr->__parent;
-    // cout << symbol << " becoming " << chunk << " with " << node_depth <<
-    // endl;
   }
 
-  // cout << symbol << " becomes " << chunk << " with " << node_depth << endl;
+  while (!s.empty())
+  {
+     key_map::chunk_type curr = s.top();
+     single_one = curr << (node_depth - s.size());
+     chunk = chunk | single_one;
+     s.pop();
+  }
+
+
+  cout << symbol << " becomes " << chunk << " with " << node_depth << endl;
 
   return make_pair(chunk, node_depth);
 }
@@ -89,17 +104,10 @@ void key_map::__write_head(ostream& out) {
 void print_tree(node_ptr ptr) {
   if (ptr) {
     print_tree(ptr->__left);
-    // cout << *ptr << endl;
+    cout << *ptr << endl;
     print_tree(ptr->__right);
   }
 
-  // queue<node_ptr> q;
-  // q.push(ptr);
-
-  // while(!q.empty()) {
-  //   node_ptr top = q.top();
-  //   cout << *top ;
-  // }
 }
 
 node_ptr key_map::__build_tree() {
