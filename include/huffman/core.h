@@ -4,28 +4,46 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <memory>
+
 
 // major * 10000 + minor * 100 + patch.
 #define HUFFMAN_VERSION 00001
 
 namespace huffman {
 
+using namespace std;
 struct __frequency_node {
-  __frequency_node* parent;
+
+  shared_ptr<__frequency_node> __parent;
+  shared_ptr<__frequency_node> __left;
+  shared_ptr<__frequency_node> __right;
 
   uint8_t __value;
   uint32_t __frequency;
 
-  void __merge(__frequency_node&);
+  shared_ptr<__frequency_node> __merge(__frequency_node&);
+
 };
 
-// template<>
-
-bool operator>(const __frequency_node&, const __frequency_node&);
+bool operator<(const __frequency_node&, const __frequency_node&);
 
 std::ostream& operator<<(std::ostream&, const __frequency_node&);
-// std::istream& operator >> (const std::istream&, __frequency_node&);
+
 std::ifstream& operator>>(std::ifstream&, __frequency_node&);
+
+class __compressor {
+
+  private:
+  string file_name;
+
+  public:
+  __compressor(const string&);
+  void __run(string);
+
+
+};
+
 }  // namespace huffman
 
 #endif
