@@ -45,12 +45,26 @@ void __key_map::__feed_node(const __frequency_node& np) {
   }
 }
 
+void __key_map::__write_head(ostream& out) {
+  uint8_t len = static_cast<uint8_t>(__symbols.size());
+  char* len_ptr = (char*) &len;
+  out.write(len_ptr, sizeof(len_ptr));
+  for (auto it = __symbols.begin(); it != __symbols.end(); it++) {
+    __frequency_node node = it->second;
+    char* symbol = (char*)&node.__value;
+    char* freq = (char*)&node.__frequency;
+
+    out.write(symbol, sizeof(symbol));
+    out.write(freq, sizeof(freq));
+  }
+}
+
 __node_ptr __key_map::__build_tree() {
 
   priority_queue<__node_ptr, vector<__node_ptr>, __greater_ptr<__node_ptr>> q;
 
   for (auto it = __symbols.begin(); it != __symbols.end(); it++) {
-    cout << it->second << endl;
+    // cout << it->second << endl;
     q.push(&it->second);
   }
 

@@ -56,6 +56,7 @@ class __key_map {
 
   void __feed_node(const __frequency_node&);
   __node_ptr __build_tree();
+  void __write_head(ostream&);
   void __reset();
   __translation_pair translate(uint8_t symbol);
 };
@@ -69,7 +70,7 @@ class compressor {
  public:
   compressor(const string&, const string&);
 
-  void __build_key_tree();
+  void __build_key_tree(ifstream&);
   void __write_and_reset(ofstream&, uint64_t&, uint8_t&);
   void compress();
 };

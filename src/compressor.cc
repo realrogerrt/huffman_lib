@@ -5,8 +5,8 @@ namespace huffman {
 compressor::compressor(const string& fn, const string& ofn)
     : __file_name(fn), __out_file_name(ofn) {}
 
-void compressor::__build_key_tree() {
-  ifstream is(__file_name, ios::binary | ios::in);
+void compressor::__build_key_tree(ifstream& is) {
+  // ifstream is(__file_name, ios::binary | ios::in);
   __frequency_node n;
 
   while (is >> n) {
@@ -14,14 +14,15 @@ void compressor::__build_key_tree() {
   }
   __node_ptr root = __key_map_ref.__build_tree();
 
-  cout << *root << endl;
+  // cout << *root << endl;
 }
 
 void compressor::compress() {
-  __build_key_tree();
-
   ifstream is(__file_name, ios::binary | ios::in);
   ofstream os(__out_file_name, ios::binary | ios::out);
+
+  __build_key_tree(is);
+  __key_map_ref.__write_head(os);
 
   uint8_t symbol;
 
@@ -29,6 +30,8 @@ void compressor::compress() {
   // TODO: This 64 constant must come from compile time limits
   uint8_t remaining_bits = 64;
 
+  is.clear();
+  is.seekg(0);
   while (is >> symbol) {
     __key_map::__translation_pair p = __key_map_ref.translate(symbol);
     // cout << static_cast<char>(symbol) << ":" << std::hex
