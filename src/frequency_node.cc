@@ -2,12 +2,13 @@
 
 namespace huffman {
 
-bool operator<(const __frequency_node& a, const __frequency_node& b) {
-  return a.__frequency < b.__frequency;
+bool operator>(const __frequency_node& a, const __frequency_node& b) {
+  return a.__frequency > b.__frequency;
 }
 
-__frequency_node* __frequency_node::__merge(__frequency_node* other) {
-  __frequency_node* n = new __frequency_node;
+
+__node_ptr __frequency_node::__merge(__node_ptr other) {
+  __node_ptr n = new __frequency_node;
   n->__frequency = this->__frequency + other->__frequency;
 
   n->__left = this;
@@ -25,10 +26,7 @@ std::ostream& operator<<(std::ostream& os, const __frequency_node& n) {
 }
 
 std::ifstream& operator>>(std::ifstream& is, __frequency_node& n) {
-  char data;
-  is >> data;
-
-  n.__value = static_cast<uint8_t>(data);
+  is >> n.__value;
   n.__frequency = 1;
 
   return is;
