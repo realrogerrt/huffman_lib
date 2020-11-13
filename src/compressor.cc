@@ -6,12 +6,12 @@ compressor::compressor(const string& fn, const string& ofn)
     : __file_name(fn), __out_file_name(ofn) {}
 
 void compressor::__build_key_tree(ifstream& is) {
-  __frequency_node n;
+  frequency_node n;
 
   while (is >> n) {
     __key_map_ref.__feed_node(n);
   }
-  __node_ptr root = __key_map_ref.__build_tree();
+  node_ptr root = __key_map_ref.__build_tree();
 }
 
 void compressor::compress() {
@@ -21,7 +21,7 @@ void compressor::compress() {
   __build_key_tree(is);
   __key_map_ref.__write_head(os);
 
-  typedef __frequency_node::symbol_type symbol_type;
+  typedef frequency_node::symbol_type symbol_type;
 
   symbol_type symbol;
   size_t symbol_sz = sizeof(symbol);
@@ -38,11 +38,11 @@ void compressor::compress() {
   while (is.read(bin, sizeof(bin))) {
 
     symbol = (symbol_type) *bin;
-    __key_map::__translation_pair p = __key_map_ref.translate(symbol);
+    key_map::translation_pair p = __key_map_ref.translate(symbol);
     // debug(p.second);
     // debug(remaining_bits);
 
-    __key_map::chunk_type symbol_chunk = p.first;
+    key_map::chunk_type symbol_chunk = p.first;
     symbol_chunk <<= (symbol_bits - p.second);
     uint64_t extended_chunk = static_cast<uint64_t>(symbol_chunk);
     int overflow_bits = p.second - remaining_bits;
