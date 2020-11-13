@@ -9,7 +9,7 @@ void __key_map::__reset() {
   }
 }
 
-__key_map::__translation_pair __key_map::translate(uint8_t symbol) {
+__key_map::__translation_pair __key_map::translate(__frequency_node::symbol_type symbol) {
 
   if (__symbols.count(symbol) == 0)
   {
@@ -64,7 +64,6 @@ __node_ptr __key_map::__build_tree() {
   priority_queue<__node_ptr, vector<__node_ptr>, __greater_ptr<__node_ptr>> q;
 
   for (auto it = __symbols.begin(); it != __symbols.end(); it++) {
-    // cout << it->second << endl;
     q.push(&it->second);
   }
 
@@ -78,9 +77,7 @@ __node_ptr __key_map::__build_tree() {
     b = q.top();
     q.pop();
 
-    // cout << "merging" << endl << *a << endl << *b << endl;
     merged = a->__merge(b);
-    // cout << "merged" << *merged << endl;
     q.push(merged);
   }
 
