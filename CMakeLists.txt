@@ -184,7 +184,7 @@ endfunction()
 
 # Define the huffman library, its includes and the needed defines.
 add_headers(HUFFMAN_HEADERS core.h os.h)
-set(HUFFMAN_SOURCES src/core.cc)
+set(HUFFMAN_SOURCES src/core.cc src/frequency_node src/compressor)
 
 add_library(huffman ${HUFFMAN_SOURCES} ${HUFFMAN_HEADERS} README.rst ChangeLog.rst)
 add_library(huffman::huffman ALIAS huffman)
