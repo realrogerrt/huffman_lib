@@ -64,9 +64,9 @@ __node_ptr __key_map::__build_tree() {
     b = q.top();
     q.pop();
 
-    cout << "merging" << endl << *a << endl << *b << endl;
+    // cout << "merging" << endl << *a << endl << *b << endl;
     merged = a->__merge(b);
-    cout << "merged" << *merged << endl;
+    // cout << "merged" << *merged << endl;
     q.push(merged);
   }
 

@@ -50,7 +50,7 @@ class __key_map {
   __symbol_map __symbols;
 
  public:
-  typedef pair<uint32_t, uint8_t> __translation_pair;
+  typedef pair<uint8_t, uint8_t> __translation_pair;
   typedef __translation_pair::first_type chunk_type;
   typedef __translation_pair::second_type count_type;
 
@@ -63,12 +63,14 @@ class __key_map {
 class compressor {
  private:
   string __file_name;
+  string __out_file_name;
   __key_map __key_map_ref;
 
  public:
-  compressor(const string&);
+  compressor(const string&, const string&);
 
   void __build_key_tree();
+  void __write_and_reset(ofstream&, uint64_t&, uint8_t&);
   void compress();
 };
 
