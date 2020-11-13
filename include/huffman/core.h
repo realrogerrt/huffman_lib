@@ -75,6 +75,7 @@ class compressor {
   void __build_key_tree(ifstream&);
   void __write_and_reset(ofstream&, uint64_t&, size_t&);
   void compress();
+  void expand();
 };
 
 }  // namespace huffman

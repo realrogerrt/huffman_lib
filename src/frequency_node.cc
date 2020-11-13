@@ -26,12 +26,14 @@ std::ostream& operator<<(std::ostream& os, const frequency_node& n) {
 }
 
 std::ifstream& operator>>(std::ifstream& is, frequency_node& n) {
-  n.__frequency = 1;
-
   char* bin = new char[sizeof(frequency_node::symbol_type)];
   is.read(bin, sizeof(bin));
   n.__value = (frequency_node::symbol_type) *bin;
+  delete[] bin;
 
+  bin = new char[sizeof(frequency_node::frequency_type)];
+  is.read(bin, sizeof(bin));
+  n.__frequency = (frequency_node::frequency_type) *bin;
   delete[] bin;
 
   return is;

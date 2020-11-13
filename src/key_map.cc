@@ -39,16 +39,17 @@ key_map::translation_pair key_map::translate(frequency_node::symbol_type symbol)
 void key_map::__feed_node(const frequency_node& np) {
   if (__symbols.count(np.__value) == 0) {
     __symbols[np.__value].__value = np.__value;
-    __symbols[np.__value].__frequency = 1;
+    __symbols[np.__value].__frequency = np.__frequency;
   } else {
     __symbols[np.__value].__frequency ++;
   }
 }
 
 void key_map::__write_head(ostream& out) {
-  uint8_t len = static_cast<uint8_t>(__symbols.size());
+  out.seekp(0);
+  size_t len = __symbols.size();
   char* len_ptr = (char*) &len;
-  out.write(len_ptr, sizeof(len_ptr));
+  out.write(len_ptr, sizeof(len));
   for (auto it = __symbols.begin(); it != __symbols.end(); it++) {
     frequency_node node = it->second;
     char* symbol = (char*)&node.__value;

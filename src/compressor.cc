@@ -7,11 +7,31 @@ compressor::compressor(const string& fn, const string& ofn)
 
 void compressor::__build_key_tree(ifstream& is) {
   frequency_node n;
+  n.__frequency = 1;
 
-  while (is >> n) {
+  while (is.read((char*)&n.__value, sizeof(n.__value))) {
     __key_map_ref.__feed_node(n);
   }
   node_ptr root = __key_map_ref.__build_tree();
+}
+
+void compressor::expand() {
+  ifstream is(__file_name, ios::binary | ios::in);
+  ofstream os(__out_file_name, ios::binary | ios::out);
+
+  size_t len;
+  is.read(reinterpret_cast<char*>(&len), sizeof(len));
+  frequency_node n;
+
+  while (len--) {
+    is >> n;
+    __key_map_ref.__feed_node(n);
+  }
+
+  node_ptr root = __key_map_ref.__build_tree();
+
+  is.close();
+  os.close();
 }
 
 void compressor::compress() {
@@ -86,7 +106,6 @@ void compressor::__write_and_reset(ofstream& os, uint64_t& chunk, size_t& remain
   size_t chunk_bits = chunk_size * 8;
   char* data_ptr = (char*)&chunk;
   size_t bytes_used = (chunk_bits - remaining) / 8;
-  // debug(bytes_used);
   os.write(data_ptr, bytes_used);
   chunk = 0;
   remaining = chunk_bits;
