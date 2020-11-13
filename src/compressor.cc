@@ -32,7 +32,11 @@ void compressor::compress() {
 
   is.clear();
   is.seekg(0);
-  while (is >> symbol) {
+  char* bin = new char[1];
+  // while (is >> symbol) {
+  while (is.read(bin, 1)) {
+
+    symbol = (uint8_t) *bin;
     __key_map::__translation_pair p = __key_map_ref.translate(symbol);
     // cout << static_cast<char>(symbol) << ":" << std::hex
     //      << static_cast<int>(symbol) << ":" << std::dec
@@ -71,6 +75,7 @@ void compressor::compress() {
     }
 
   }
+  delete [] bin;
 
   if (remaining_bits < 64) {
     __write_and_reset(os, chunk_to_write, remaining_bits);

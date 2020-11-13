@@ -26,8 +26,14 @@ std::ostream& operator<<(std::ostream& os, const __frequency_node& n) {
 }
 
 std::ifstream& operator>>(std::ifstream& is, __frequency_node& n) {
-  is >> n.__value;
+  // is >> n.__value;
   n.__frequency = 1;
+
+  char* bin = new char[1];
+  is.read(bin, 1);
+  n.__value = (uint8_t) *bin;
+
+  delete[] bin;
 
   return is;
 }
