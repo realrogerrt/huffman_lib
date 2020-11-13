@@ -31,46 +31,42 @@ void compressor::compress() {
 
   while (is >> symbol) {
     __key_map::__translation_pair p = __key_map_ref.translate(symbol);
-
     // cout << static_cast<char>(symbol) << ":" << std::hex
     //      << static_cast<int>(symbol) << ":" << std::dec
     //      << static_cast<int>(p.first) << ":" << std::dec
     //      << static_cast<int>(p.second) << endl;
 
-    if (p.second < remaining_bits) {
-      __key_map::chunk_type symbol_chunk = p.first;
-      // Moving 01 sequence to the front of the memory chunk
-      // TODO: This 8 constant must come from compile time limits
-      symbol_chunk <<= (8 - p.second);
-      uint64_t extended_chunk = static_cast<uint64_t>(symbol_chunk);
-      // creating 64 bits memory chunk with the symbol chunk at its place filled
-      // out with zeroes
-      // TODO: This 8 constant must come from compile time limits
-      extended_chunk <<= (remaining_bits - 8);
-      chunk_to_write = chunk_to_write | extended_chunk;
-      remaining_bits -= p.second;
+    __key_map::chunk_type symbol_chunk = p.first;
+    // Moving 01 sequence to the front of the memory chunk
+    // TODO: This 8 constant must come from compile time limits
+    symbol_chunk <<= (8 - p.second);
+    // Creating 64 bit sequence to make or
+    uint64_t extended_chunk = static_cast<uint64_t>(symbol_chunk);
+    // Calculating bits whom overflow
+    uint8_t bits_for_next_chunk = max(p.second - remaining_bits, 0);
+    // Positioning the 64 bits chunk in the correct place
+    extended_chunk <<= (remaining_bits - 8 + bits_for_next_chunk);
+    // Addedin new chunk to the chunk to be written eventually
+    chunk_to_write = chunk_to_write | extended_chunk;
 
-      if (remaining_bits == 0) {
-        __write_and_reset(os, chunk_to_write, remaining_bits);
-      }
-    } else {
-      uint8_t bits_for_next_chunk = p.second - remaining_bits;
-      __key_map::chunk_type symbol_chunk = p.first;
-      symbol_chunk <<= (8 - p.second);
-      uint64_t extended_chunk = static_cast<uint64_t>(symbol_chunk);
+    remaining_bits -= (p.second - bits_for_next_chunk);
 
-      extended_chunk >>= bits_for_next_chunk;
-      chunk_to_write = chunk_to_write | extended_chunk;
+    if (remaining_bits == 0) {
       __write_and_reset(os, chunk_to_write, remaining_bits);
+    }
 
+    // TODO: All these 8's and 64's must come from generic info
+    if (bits_for_next_chunk > 0)
+    {
       symbol_chunk = p.first;
-      symbol_chunk <<= (8 - p.second);
-      symbol_chunk <<= (p.second - bits_for_next_chunk);
+      symbol_chunk <<= (8 - bits_for_next_chunk);
       extended_chunk = static_cast<uint64_t>(symbol_chunk);
+      extended_chunk <<= (64 - 8);
 
       chunk_to_write = extended_chunk;
       remaining_bits -= bits_for_next_chunk;
     }
+
   }
 
   if (remaining_bits < 64) {
